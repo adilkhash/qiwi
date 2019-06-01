@@ -1,0 +1,1 @@
+# Python Qiwi API client
