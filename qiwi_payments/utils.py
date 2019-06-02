@@ -1,3 +1,6 @@
+import hmac
+import base64
+import hashlib
 import logging
 from typing import Union, Optional
 
@@ -9,6 +12,7 @@ from requests import (
     Response,
 )
 
+from qiwi_payments.models import Invoice
 
 logger = logging.getLogger(__name__)
 
@@ -72,3 +76,16 @@ class HttpClient(object):
             raise APIError(f'Invalid JSON body: {self.response.content}') from e
         else:
             return result
+
+
+def generate_hmac_hash(invoice: Invoice, secret_key: str) -> bytes:
+    invoice_params = [
+        f'{invoice.amount.currency}',
+        f'{invoice.amount.value}',
+        f'{invoice.bill_id}',
+        f'{invoice.site_id}',
+        f'{invoice.status.value}',
+    ]
+    string = '|'.join(invoice_params)
+    digest = hmac.HMAC(secret_key.encode('utf-8'), string.encode('utf-8'), hashlib.sha256).digest()
+    return base64.b64encode(digest).decode()

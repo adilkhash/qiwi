@@ -32,7 +32,6 @@ class QiwiKassa:
             email: str = '',
             timezone: str = 'Europe/Moscow') -> Invoice:
         """
-
         :param amount: amount value
         :param currency: ISO code of currency
         :param comment: optional comment to invoice
@@ -67,18 +66,18 @@ class QiwiKassa:
         return Invoice.prepare(self.api.to_json())
 
     def check_bill(self, bill_id: str) -> Invoice:
-        url = '{}{}'.format(self.base_url, bill_id)
+        url = f'{self.base_url}{bill_id}'
         self.api.make_request(url, method='get', headers=self.headers)
         return Invoice.prepare(self.api.to_json())
 
     def cancel_bill(self, bill_id: str) -> Invoice:
-        url = '{}{}/reject'.format(self.base_url, bill_id)
+        url = f'{self.base_url}{bill_id}/reject'
         headers = self.headers
         self.api.make_request(url, method='post', headers=headers)
         return Invoice.prepare(self.api.to_json())
 
     def refund_bill(self, amount: Decimal, bill_id: str, currency: str = 'RUB') -> Refund:
-        url = '{}{}/refunds/{}'.format(self.base_url, bill_id, uuid.uuid4())
+        url = f'{self.base_url}{bill_id}/refunds/{uuid.uuid4()}'
         payload = {
             'amount': {
                 'currency': currency.upper(),

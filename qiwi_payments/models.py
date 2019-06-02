@@ -12,7 +12,7 @@ class Amount(NamedTuple):
     value: Decimal
 
     def __repr__(self):
-        return '<Amount: {}{}>'.format(self.currency, self.value)
+        return f'<Amount: {self.currency}{self.value}>'
 
     @classmethod
     def prepare(cls, data: dict) -> 'Amount':
@@ -35,6 +35,7 @@ class Status(NamedTuple):
             value=data['status']['value'],
             changed_dt=parse(data['status']['changedDateTime'])
         )
+
 
 class Invoice(NamedTuple):
     site_id: str
@@ -74,7 +75,7 @@ class Refund(NamedTuple):
     status: PaymentStatus
 
     def __repr__(self):
-        return '<Refund {}>'.format(self.refund_id)
+        return f'<Refund {self.refund_id}>'
 
     @classmethod
     def prepare(cls, data: dict) -> 'Refund':
