@@ -4,7 +4,9 @@ import datetime as dt
 from decimal import Decimal
 
 import pytz
+
 from qiwi_payments.utils import HttpClient
+from qiwi_payments.models import Invoice, Refund
 
 
 class QiwiKassa:
@@ -28,7 +30,7 @@ class QiwiKassa:
             comment: str = '',
             expire_in: dt.timedelta = dt.timedelta(days=1),
             email: str = '',
-            timezone: str = 'Europe/Moscow') -> dict:
+            timezone: str = 'Europe/Moscow') -> Invoice:
         """
 
         :param amount: amount value
@@ -62,20 +64,20 @@ class QiwiKassa:
             payload['customer']['account'] = email
 
         self.api.make_request(url, method='put', headers=self.headers, data=json.dumps(payload))
-        return self.api.to_json()
+        return Invoice.prepare(self.api.to_json())
 
-    def check_bill(self, bill_id: str) -> dict:
+    def check_bill(self, bill_id: str) -> Invoice:
         url = '{}{}'.format(self.base_url, bill_id)
         self.api.make_request(url, method='get', headers=self.headers)
-        return self.api.to_json()
+        return Invoice.prepare(self.api.to_json())
 
-    def cancel_bill(self, bill_id: str) -> dict:
+    def cancel_bill(self, bill_id: str) -> Invoice:
         url = '{}{}/reject'.format(self.base_url, bill_id)
         headers = self.headers
         self.api.make_request(url, method='post', headers=headers)
-        return self.api.to_json()
+        return Invoice.prepare(self.api.to_json())
 
-    def refund_bill(self, amount: Decimal, bill_id: str, currency: str = 'RUB') -> dict:
+    def refund_bill(self, amount: Decimal, bill_id: str, currency: str = 'RUB') -> Refund:
         url = '{}{}/refunds/{}'.format(self.base_url, bill_id, uuid.uuid4())
         payload = {
             'amount': {
@@ -84,7 +86,7 @@ class QiwiKassa:
             }
         }
         self.api.make_request(url, method='put', data=json.dumps(payload), headers=self.headers)
-        return self.api.to_json()
+        return Refund.prepare(self.api.to_json())
 
     def get_refund_status(self, refund_id: str):
         pass
