@@ -24,17 +24,25 @@ class Amount(NamedTuple):
 
 class Status(NamedTuple):
     value: PaymentStatus
-    changed_dt: dt.datetime
+    datetime: dt.datetime
 
     def __repr__(self):
         return '<Status {}>'.format(self.value)
 
     @classmethod
     def prepare(cls, data: dict) -> 'Status':
-        return cls(
-            value=data['status']['value'],
-            changed_dt=parse(data['status']['changedDateTime'])
-        )
+        params = {
+            'value': data['status']['value']
+        }
+        if 'datetime' in data['status']:
+            params.update({
+                'datetime': parse(data['status']['datetime'])
+            })
+        if 'changedDateTime' in data['status']:
+            params.update({
+                'datetime': parse(data['status']['changedDateTime'])
+            })
+        return cls(**params)
 
 
 class Invoice(NamedTuple):
@@ -62,7 +70,7 @@ class Invoice(NamedTuple):
             comment=data.get('comment', ''),
             creation_dt=parse(data['creationDateTime']),
             expiration_dt=parse(data['expirationDateTime']),
-            pay_url=data['payUrl'],
+            pay_url=data.get('payUrl'),
             customer=data.get('customer', {}),
             custom_fields=data.get('customFields', {})
         )
