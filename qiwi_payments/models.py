@@ -75,6 +75,18 @@ class Invoice(NamedTuple):
             custom_fields=data.get('customFields', {})
         )
 
+    @property
+    def is_paid(self):
+        return self.status.value == PaymentStatus.PAID
+
+    @property
+    def is_canceled(self):
+        return self.status.value == PaymentStatus.REJECTED
+
+    @property
+    def is_expired(self):
+        return self.status.value == PaymentStatus.EXPIRED
+
 
 class Refund(NamedTuple):
     amount: Amount

@@ -26,11 +26,13 @@ class QiwiKassa:
     def create_bill(
             self,
             amount: Decimal,
+            *,
             currency: str = 'RUB',
             comment: str = '',
             expire_in: dt.timedelta = dt.timedelta(days=1),
             email: str = '',
-            timezone: str = 'Europe/Moscow') -> Invoice:
+            timezone: str = 'Europe/Moscow',
+            bill_id: str = '') -> Invoice:
         """
         :param amount: amount value
         :param currency: ISO code of currency
@@ -38,9 +40,10 @@ class QiwiKassa:
         :param expire_in: timedelta object which indicates when invoice should be expired from now
         :param email: optional customer email
         :param timezone: timezone for invoice expiration
+        :param bill_id: optional unique bill id. if empty, uuid4 will be generated
         :return: dict
         """
-        url = '{}{}'.format(self.base_url, uuid.uuid4())
+        url = '{}{}'.format(self.base_url, bill_id or uuid.uuid4())
         timezone = pytz.timezone(timezone)
         expire_dt = timezone.localize(dt.datetime.now() + expire_in)
 
@@ -86,6 +89,3 @@ class QiwiKassa:
         }
         self.api.make_request(url, method='put', data=json.dumps(payload), headers=self.headers)
         return Refund.prepare(self.api.to_json())
-
-    def get_refund_status(self, refund_id: str):
-        pass
