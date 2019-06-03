@@ -7,7 +7,7 @@ install_requires = [
 ]
 
 setup(
-    name='qiwi',
+    name='qiwi_payments',
     version='0.1',
     packages=['qiwi_payments'],
     url='https://github.com/adilkhash/qiwi',
