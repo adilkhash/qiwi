@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 install_requires = [
-    'requests==2.22',
+    'requests==2.31.0',
     'pytz==2019.1',
     'python-dateutil==2.8.0',
 ]
